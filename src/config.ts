@@ -415,6 +415,36 @@ type Config = {
      */
     proxyUrl?: string;
   };
+  /**
+  * Whether to enable openai content moderation
+  */
+  allowOpenAIModeration: boolean;
+  /**
+  * Key for openai content moderation
+  */
+  openaiModerationKey?: string;
+  /**
+  * Which model to use for content moderation
+  */
+  openaiModerationModel?: string;
+  /**
+  * Moderation thresholds for content filtering
+  */
+  moderationThresholds: {
+    sexual: number;
+    'sexual/minors': number;
+    harassment: number;
+    'harassment/threatening': number;
+    hate: number;
+    'hate/threatening': number;
+    illicit: number;
+    'illicit/violent': number;
+    'self-harm': number;
+    'self-harm/intent': number;
+    'self-harm/instructions': number;
+    violence: number;
+    'violence/graphic': number;
+  };
 };
 
 // To change configs, create a file called .env in the root directory.
@@ -525,6 +555,24 @@ export const config: Config = {
     interface: getEnvWithDefault("HTTP_AGENT_INTERFACE", undefined),
     proxyUrl: getEnvWithDefault("HTTP_AGENT_PROXY_URL", undefined),
   },
+  allowOpenAIModeration: getEnvWithDefault("ALLOW_OPENAI_MODERATION", false),
+  openaiModerationKey: getEnvWithDefault("OPENAI_MODERATION_KEY", ""),
+  openaiModerationModel: getEnvWithDefault("OPENAI_MODERATION_MODEL", "omni-moderation-latest"),
+  moderationThresholds: {
+    sexual: getEnvWithDefault("MODERATION_THRESHOLD_SEXUAL", 1),
+    'sexual/minors': getEnvWithDefault("MODERATION_THRESHOLD_SEXUAL_MINORS", 1),
+    harassment: getEnvWithDefault("MODERATION_THRESHOLD_HARASSMENT", 1),
+    'harassment/threatening': getEnvWithDefault("MODERATION_THRESHOLD_HARASSMENT_THREATENING", 1),
+    hate: getEnvWithDefault("MODERATION_THRESHOLD_HATE", 1),
+    'hate/threatening': getEnvWithDefault("MODERATION_THRESHOLD_HATE_THREATENING", 1),
+    illicit: getEnvWithDefault("MODERATION_THRESHOLD_ILLICIT", 1),
+    'illicit/violent': getEnvWithDefault("MODERATION_THRESHOLD_ILLICIT_VIOLENT", 1),
+    'self-harm': getEnvWithDefault("MODERATION_THRESHOLD_SELF_HARM", 1),
+    'self-harm/intent': getEnvWithDefault("MODERATION_THRESHOLD_SELF_HARM_INTENT", 1),
+    'self-harm/instructions': getEnvWithDefault("MODERATION_THRESHOLD_SELF_HARM_INSTRUCTIONS", 1),
+    violence: getEnvWithDefault("MODERATION_THRESHOLD_VIOLENCE", 1),
+    'violence/graphic': getEnvWithDefault("MODERATION_THRESHOLD_VIOLENCE_GRAPHIC", 1)
+  }
 } as const;
 
 function generateSigningKey() {
@@ -538,6 +586,7 @@ function generateSigningKey() {
   const secrets = [
     config.adminKey,
     config.openaiKey,
+    config.openaiModerationKey,
     config.anthropicKey,
     config.googleAIKey,
     config.mistralAIKey,
@@ -687,6 +736,7 @@ export const OMITTED_KEYS = [
   "bindAddress",
   "logLevel",
   "openaiKey",
+  "openaiModerationKey",
   "anthropicKey",
   "googleAIKey",
   "mistralAIKey",
