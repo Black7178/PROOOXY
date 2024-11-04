@@ -10,6 +10,7 @@ import {
   flattenAnthropicMessages,
 } from "../../../../shared/api-schemas";
 import { GoogleAIV1GenerateContentSchema } from "../../../../shared/api-schemas/google-ai";
+import { checkModeration } from "./openai-moderation";
 
 const rejectedClients = new Map<string, number>();
 
@@ -29,8 +30,15 @@ setInterval(() => {
  */
 export const languageFilter: RequestPreprocessor = async (req) => {
   if (!config.rejectPhrases.length) return;
-
   const prompt = getPromptFromRequest(req);
+  try {
+    await checkModeration(req, prompt);
+  } catch (error) {
+    if (error instanceof BadRequestError) {
+      throw error;
+    }
+    req.log.warn({ error }, "OpenAI moderation failed, falling back to regex filtering");
+  }
   const match = config.rejectPhrases.find((phrase) =>
     prompt.match(new RegExp(phrase, "i"))
   );
