@@ -25,7 +25,7 @@ export const OpenAIV1ChatCompletionSchema = z
         content: z.union([z.string(), OpenAIV1ChatContentArraySchema]),
         name: z.string().optional(),
         tool_calls: z.array(z.any()).optional(),
-        function_call: z.array(z.any()).optional(),
+        function_call: z.any().optional(),
         tool_call_id: z.string().optional(),
       }),
       {
