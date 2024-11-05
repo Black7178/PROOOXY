@@ -26,7 +26,7 @@ import {
   ModelFamily,
 } from "../models";
 import { assertNever } from "../utils";
-import { User, UserTokenCounts, UserUpdate } from "./schema";
+import { User, UserTokenCounts, UserUpdate } from "../database/repos/users";
 
 const log = logger.child({ module: "users" });
 
